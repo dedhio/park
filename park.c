@@ -20,10 +20,10 @@ int verificarHorario(char *horario)
 {
   const char substring[2] = ":";
 
-  if (strstr(horario, substring) != NULL)
-  {
-    return 0;
-  }
+  // if (strstr(horario, substring) != NULL)
+  // {
+  //   return 0;
+  // }
 
   if (verificarNumero(horario))
   {
