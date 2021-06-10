@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-int verificarNumero(char *entrada) {
+int verificarNumero(char *horario) {
   int i;
 
-  for (i = 0; entrada[i] != '\0'; i++)
+  for (i = 0; horario[i] != '\0'; i++)
   {
-    if (entrada[i] != '/' && !isdigit(entrada[i]))
+    if (horario[i] != ':' && !isdigit(horario[i]))
     {
       return 0;
     }
@@ -16,16 +16,16 @@ int verificarNumero(char *entrada) {
   return 1;
 }
 
-int verificarData(char *entrada)
+int verificarHorario(char *horario)
 {
-  const char substring[3] = "//";
+  const char substring[2] = ":";
 
-  if (strstr(entrada, substring) != NULL)
+  if (strstr(horario, substring) != NULL)
   {
     return 0;
   }
 
-  if (verificarNumero(entrada))
+  if (verificarNumero(horario))
   {
     printf("São numéricos.\n");
   }
@@ -36,22 +36,21 @@ int verificarData(char *entrada)
   }
 
   int i = 0;
-  long data[3];
-  const char delimitador[2] = "/";
-  char *token = strtok(entrada, delimitador);
+  long tempo[2];
+  const char delimitador[2] = ":";
+  char *token = strtok(horario, delimitador);
 
   // Alimenta o vetor de inteiros
   while (token != NULL)
   {
-    data[i++] = strtol(token, NULL, 10);
+    tempo[i++] = strtol(token, NULL, 10);
     token = strtok(NULL, delimitador);
   }
 
   // Realize suas validações. Se alguma não for atingida, retorne '0'
 
-  printf("Dia: %d\n", data[0]);
-  printf("Mes: %d\n", data[1]);
-  printf("Ano: %d\n", data[2]);
+  printf("Horas: %d\n", tempo[0]);
+  printf("Minutos: %d\n", tempo[1]);
 
   // Caso contrário, retorne '1'
 
@@ -60,12 +59,16 @@ int verificarData(char *entrada)
 
 int main()
 {
-  char str[80];
+  char entrada[80];
+  char saida[80];
 
-  printf("Digite uma data: ");
-  gets(str);
+  printf("Horário de entrada -> ");
+  gets(entrada);
+  printf("%d\n", verificarHorario(entrada));
 
-  printf("%d\n", verificarData(str));
+  printf("Horário de saída -> ");
+  gets(saida);
+  printf("%d\n", verificarHorario(saida));
 
   return(0);
 }
