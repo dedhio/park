@@ -38,13 +38,13 @@ int validaHorario(char *horario)
 
   sscanf(horario , "%d:%d" , &horas,&minutos);
 
-  if (horas>23)
+  if (horas > 23)
   {
     printf("ERRO: A hora não pode ser maior que 24. \n");
     return 0;
   }
 
-  if (minutos>60)
+  if (minutos > 60)
   {
     printf("ERRO: Os minutos não podem ser maiores que 60. \n");
     return 0;
@@ -76,8 +76,8 @@ int calculaPermanencia(char *entrada, char *saida)
     return 0;
   }
 
-  intervalo_entrada = (horas_entrada*60)+minutos_entrada;
-  intervalo_saida = (horas_saida*60)+minutos_saida;
+  intervalo_entrada = (horas_entrada * 60)  +minutos_entrada;
+  intervalo_saida = (horas_saida * 60) + minutos_saida;
 
   if (intervalo_saida > intervalo_entrada)
   {
