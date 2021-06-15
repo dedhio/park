@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 int verificaNumero(char *horario) {
   int i;
 
   for (i = 0; horario[i] != '\0'; i++)
   {
-    if (horario[i] != ':' && !isdigit(horario[i]))
+    if (horario[i] != ':' && horario[i] != 10 && !isdigit(horario[i]))
     {
       return 0;
     }
@@ -19,6 +20,7 @@ int verificaNumero(char *horario) {
 int validaHorario(char *horario)
 {
   const char substring[2] = ":";
+  int horas=0, minutos=0;
 
   if (strstr(horario, substring) == NULL)
   {
@@ -26,30 +28,23 @@ int validaHorario(char *horario)
     return 0;
   }
 
+  printf("%s \n", horario);
+
   if (!verificaNumero(horario))
   {
     printf("ERRO: O horário informado não é numérico. \n");
     return 0;
   }
 
-  int i = 0;
-  long tempo[2];
-  const char delimitador[2] = ":";
-  char *token = strtok(horario, delimitador);
+  sscanf(horario , "%d:%d" , &horas,&minutos);
 
-  while (token != NULL)
-  {
-    tempo[i++] = strtol(token, NULL, 10);
-    token = strtok(NULL, delimitador);
-  }
-
-  if (tempo[0]>23)
+  if (horas>23)
   {
     printf("ERRO: A hora não pode ser maior que 24. \n");
     return 0;
   }
 
-  if (tempo[1]>60)
+  if (minutos>60)
   {
     printf("ERRO: Os minutos não podem ser maiores que 60. \n");
     return 0;
@@ -61,59 +56,45 @@ int validaHorario(char *horario)
 int calculaPermanencia(char *entrada, char *saida)
 {
   int i = 0;
-  int tempo_entrada[2];
-  int tempo_saida[2];
+  int horas_entrada, horas_saida, minutos_entrada, minutos_saida;
   int horas_consideradas = 0;
-  int minutos_entrada, minutos_saida;
+  int intervalo_entrada, intervalo_saida;
   int intervalo = 0;
-  const char delimitador[2] = ":";
-  char *tokenEntrada = strtok(entrada, delimitador);
-  char *tokenSaida = strtok(saida, delimitador);
 
-  printf("Foi 1");
+  sscanf(entrada , "%d:%d" , &horas_entrada,&minutos_entrada);
+  sscanf(saida , "%d:%d" , &horas_saida,&minutos_saida);
 
-  while (tokenEntrada != NULL)
-  {
-    tempo_entrada[i++] = strtol(tokenEntrada, NULL, 10);
-    tokenEntrada = strtok(NULL, delimitador);
-  }
-
-  while (tokenSaida != NULL)
-  {
-    tempo_saida[i++] = strtol(tokenSaida, NULL, 10);
-    tokenSaida = strtok(NULL, delimitador);
-  }
-
-  if (tempo_entrada[0] < 7)
+  if (horas_entrada < 7)
   {
     printf("ERRO: A entrada só é permitida a partir das 7h");
     return 0;
   }
 
-  if (tempo_saida[0] > 4 && tempo_saida[0] < 7)
+  if (horas_saida > 4 && horas_saida < 7)
   {
     printf("ERRO: A saída é permitida até as 4h");
     return 0;
   }
 
-  minutos_entrada = (tempo_entrada[0]*60)+tempo_entrada[0];
-  minutos_saida = (tempo_saida[0]*60)+tempo_saida[0];
+  intervalo_entrada = (horas_entrada*60)+minutos_entrada;
+  intervalo_saida = (horas_saida*60)+minutos_saida;
 
-  if (minutos_saida > minutos_entrada)
+  if (intervalo_saida > intervalo_entrada)
   {
-    intervalo = minutos_saida - minutos_entrada;
+    intervalo = intervalo_saida - intervalo_entrada;
   }
+
+  printf("Intervalo em minutos -> %d \n", intervalo);
 
   horas_consideradas = intervalo / 60;
   if ((intervalo % 60) > 5)
   {
     horas_consideradas++;
   } 
-  printf("Foi 2");
   return horas_consideradas;
 }
 
-int calculaPreco(int *horas_consideradas)
+int calculaPreco(int horas_consideradas)
 {
   float total = 0.00;
   int horas, minutos;
@@ -134,11 +115,11 @@ int calculaPreco(int *horas_consideradas)
     }
     if (horas_consideradas > 4 ) 
     {
-      total = total + (*horas_consideradas * 3.50);
+      total = total + (horas_consideradas * 3.50);
     }
   }
 
-  printf("valor a ser pago -> R$ %d", total);
+  printf("\nValor a ser pago -> R$ %.2f \n", total);
   return 1;
 }
 
@@ -146,28 +127,28 @@ int main()
 {
   char entrada[80];
   char saida[80];
-  int entrada_validada, saida_validada;
+  int entrada_validada = 0;
+  int saida_validada = 0;
   int horas_consideradas;
 
-  do
+  while (!entrada_validada)
   {
     printf("Horário de entrada -> ");
-    gets(entrada);
+    fgets(entrada, sizeof(entrada), stdin);
     entrada_validada = validaHorario(entrada);
-  } while (!entrada_validada);
+  }
 
-  do
+  while (!saida_validada)
   {
     printf("Horário de saída -> ");
-    gets(saida);
+    fgets(saida, sizeof(saida), stdin);
     saida_validada = validaHorario(saida);
-  } while (!saida_validada);
-
-  printf("Foi 3");
+  }
 
   if (entrada_validada && saida_validada)
   {
     horas_consideradas = calculaPermanencia(entrada, saida);
+    printf("Horas consideradas -> %d \n", horas_consideradas);
     calculaPreco(horas_consideradas);
   }
 
