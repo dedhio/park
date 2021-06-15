@@ -58,67 +58,84 @@ int validaHorario(char *horario)
   return 1;
 }
 
-int calculaIntervaloMinutos(char *entrada, char *saida)
+int calculaPermanencia(char *entrada, char *saida)
 {
   int i = 0;
-  int tempoEntrada[2];
-  int tempoSaida[2];
-  int minutosEntrada = 0; 
-  int minutosSaida = 0;
+  int tempo_entrada[2];
+  int tempo_saida[2];
+  int horas_consideradas = 0;
+  int minutos_entrada, minutos_saida;
   int intervalo = 0;
   const char delimitador[2] = ":";
   char *tokenEntrada = strtok(entrada, delimitador);
   char *tokenSaida = strtok(saida, delimitador);
 
+  printf("Foi 1");
+
   while (tokenEntrada != NULL)
   {
-    tempoEntrada[i++] = strtol(tokenEntrada, NULL, 10);
+    tempo_entrada[i++] = strtol(tokenEntrada, NULL, 10);
     tokenEntrada = strtok(NULL, delimitador);
   }
 
   while (tokenSaida != NULL)
   {
-    tempoSaida[i++] = strtol(tokenSaida, NULL, 10);
+    tempo_saida[i++] = strtol(tokenSaida, NULL, 10);
     tokenSaida = strtok(NULL, delimitador);
   }
 
-  if (tempoEntrada[0] < 8)
+  if (tempo_entrada[0] < 7)
   {
     printf("ERRO: A entrada só é permitida a partir das 7h");
     return 0;
   }
 
-  if (tempoSaida[0] > 4 && tempoSaida[0] < 7)
+  if (tempo_saida[0] > 4 && tempo_saida[0] < 7)
   {
     printf("ERRO: A saída é permitida até as 4h");
     return 0;
   }
 
-  minutosEntrada = (tempoEntrada[0]*60)+tempoEntrada[0];
-  minutosSaida = (tempoSaida[0]*60)+tempoSaida[0];
+  minutos_entrada = (tempo_entrada[0]*60)+tempo_entrada[0];
+  minutos_saida = (tempo_saida[0]*60)+tempo_saida[0];
 
-  if (minutosSaida > minutosEntrada)
+  if (minutos_saida > minutos_entrada)
   {
-    intervalo = minutosSaida - minutosEntrada;
+    intervalo = minutos_saida - minutos_entrada;
   }
 
-  return intervalo;
+  horas_consideradas = intervalo / 60;
+  if ((intervalo % 60) > 5)
+  {
+    horas_consideradas++;
+  } 
+  printf("Foi 2");
+  return horas_consideradas;
 }
 
-int calculaPreco(int *minutos_considerados)
+int calculaPreco(int *horas_consideradas)
 {
   float total = 0.00;
   int horas, minutos;
-  int intervalo = minutos_considerados;
 
-  if (minutos_considerados < 61)
+  if (horas_consideradas > 0)
   {
-    total = 8.00;
-  }
-  else if (minutos_considerados < 181)
-  {
-    horas = intervalo / 60;
-    total = 5.00 * horas;
+    if (horas_consideradas < 2)
+    {
+      total = total + 8.00;
+    }
+    if (horas_consideradas < 3 ) 
+    {
+      total = total + 5.00;
+    }
+    if (horas_consideradas < 4 ) 
+    {
+      total = total + 5.00;
+    }
+    if (horas_consideradas > 4 ) 
+    {
+      total = total + (*horas_consideradas * 3.50);
+    }
   }
 
   printf("valor a ser pago -> R$ %d", total);
@@ -129,27 +146,29 @@ int main()
 {
   char entrada[80];
   char saida[80];
-  int entradaValidada, saidaValidada;
-  int minutos_considerados;
+  int entrada_validada, saida_validada;
+  int horas_consideradas;
 
-  while (!entradaValidada)
+  do
   {
     printf("Horário de entrada -> ");
     gets(entrada);
-    entradaValidada = validaHorario(entrada);
-  }
+    entrada_validada = validaHorario(entrada);
+  } while (!entrada_validada);
 
-  while (!saidaValidada)
+  do
   {
     printf("Horário de saída -> ");
     gets(saida);
-    saidaValidada = validaHorario(saida);
-  }
+    saida_validada = validaHorario(saida);
+  } while (!saida_validada);
 
-  if (entradaValidada && saidaValidada)
+  printf("Foi 3");
+
+  if (entrada_validada && saida_validada)
   {
-    minutos_considerados = calculaIntervaloMinutos(entrada, saida);
-    calculaPreco(minutos_considerados);
+    horas_consideradas = calculaPermanencia(entrada, saida);
+    calculaPreco(horas_consideradas);
   }
 
   return(0);
